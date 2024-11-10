@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { EditTitleModal, DeleteConfirmModal } from '../features/presentations';
+import { EditTitleModal, DeleteConfirmModal, SlideControls } from '../features/presentations';
 
 export const PresentationEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [presentation, setPresentation] = useState(null);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showEditTitle, setShowEditTitle] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showError, setShowError] = useState('');
   const [loading, setLoading] = useState(true);
 
   const fetchPresentation = async () => {
@@ -141,9 +143,130 @@ export const PresentationEditor = () => {
     }
   };
 
+  const handlePreviousSlide = () => {
+    if (currentSlideIndex > 0) {
+      setCurrentSlideIndex(currentSlideIndex - 1);
+    }
+  };
+
+  const handleNextSlide = () => {
+    if (currentSlideIndex < presentation.slides.length - 1) {
+      setCurrentSlideIndex(currentSlideIndex + 1);
+    }
+  };
+
+  const handleNewSlide = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5005/store', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      const newSlide = {
+        id: Date.now().toString(),
+        content: [],
+      };
+
+      const updatedPresentation = {
+        ...presentation,
+        slides: [...presentation.slides, newSlide],
+      };
+
+      const updatedPresentations = data.store.presentations.map(p => 
+        p.id === id ? updatedPresentation : p
+      );
+
+      await fetch('http://localhost:5005/store', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          store: {
+            ...data.store,
+            presentations: updatedPresentations,
+          },
+        }),
+      });
+
+      setPresentation(updatedPresentation);
+      setCurrentSlideIndex(updatedPresentation.slides.length - 1); // Navigate to new slide
+    } catch (error) {
+      console.error('Failed to create new slide:', error);
+    }
+  };
+
+  const handleDeleteSlide = async () => {
+    if (presentation.slides.length <= 1) {
+      setShowError('Cannot delete the only slide. Delete the presentation instead.');
+      setTimeout(() => setShowError(''), 3000); // Clear error after 3 seconds
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5005/store', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      const updatedSlides = presentation.slides.filter((_, index) => index !== currentSlideIndex);
+      const updatedPresentation = {
+        ...presentation,
+        slides: updatedSlides,
+      };
+
+      const updatedPresentations = data.store.presentations.map(p => 
+        p.id === id ? updatedPresentation : p
+      );
+
+      await fetch('http://localhost:5005/store', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          store: {
+            ...data.store,
+            presentations: updatedPresentations,
+          },
+        }),
+      });
+
+      setPresentation(updatedPresentation);
+      // Navigate to previous slide or stay at current index if it's the first slide
+      setCurrentSlideIndex(prev => Math.min(prev, updatedSlides.length - 1));
+    } catch (error) {
+      console.error('Failed to delete slide:', error);
+    }
+  };
+
   useEffect(() => {
     fetchPresentation();
   }, [id]);
+
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (!presentation) return;
+      
+      if (e.key === 'ArrowLeft') {
+        handlePreviousSlide();
+      } else if (e.key === 'ArrowRight') {
+        handleNextSlide();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [presentation, currentSlideIndex]);
 
   if (loading) {
     return (
@@ -199,8 +322,62 @@ export const PresentationEditor = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8 min-h-[400px]">
-          <p className="text-gray-500 text-center">First slide</p>
+        {/* Slide Display */}
+        <div className="bg-white rounded-lg shadow-md p-8 min-h-[400px] relative mb-8">
+          {/* Slide number */}
+          <div className="absolute bottom-4 left-4 w-[50px] h-[50px] flex items-center justify-center text-gray-500">
+            {currentSlideIndex + 1}
+          </div>
+          
+          {/* Slide content placeholder */}
+          <div className="w-full h-full flex items-center justify-center">
+            <p className="text-gray-500">Slide {currentSlideIndex + 1}</p>
+          </div>
+        </div>
+
+        {/* Slide Controls */}
+        <div className="flex flex-col items-center space-y-4">
+          {/* Navigation Controls */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handlePreviousSlide}
+              disabled={currentSlideIndex === 0}
+              className={`p-2 rounded-full ${
+                currentSlideIndex === 0
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              ←
+            </button>
+            <button
+              onClick={handleNextSlide}
+              disabled={currentSlideIndex === presentation.slides.length - 1}
+              className={`p-2 rounded-full ${
+                currentSlideIndex === presentation.slides.length - 1
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              →
+            </button>
+          </div>
+
+          {/* Slide Management Controls */}
+          <div className="flex space-x-4">
+            <button
+              onClick={handleNewSlide}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            >
+              Add New Slide
+            </button>
+            <button
+              onClick={handleDeleteSlide}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            >
+              Delete Slide
+            </button>
+          </div>
         </div>
       </div>
 
@@ -217,6 +394,21 @@ export const PresentationEditor = () => {
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
       />
+
+      {/* Error Message */}
+      {showError && (
+        <div className="fixed top-4 right-4 bg-red-100 text-red-700 p-4 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between">
+            <span>{showError}</span>
+            <button 
+              onClick={() => setShowError('')}
+              className="ml-4 text-red-500 hover:text-red-700"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
