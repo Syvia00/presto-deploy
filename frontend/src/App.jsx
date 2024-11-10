@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { LoginForm, RegisterForm } from './features/auth';
 import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './pages/Dashboard';
+import { PresentationEditor } from './pages/PresentationEditor';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -26,6 +27,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/presentation/:id"
+          element={
+            <ProtectedRoute>
+              <PresentationEditor />
             </ProtectedRoute>
           }
         />
