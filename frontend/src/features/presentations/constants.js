@@ -14,7 +14,7 @@ export const PROGRAMMING_LANGUAGES = {
 // Function to detect programming language from code
 export const detectLanguage = (code) => {
   // Simple detection based on keywords and syntax
-  if (code.includes('def ') || code.includes('import ') || 'print(' in code) {
+  if (code.includes('def ') || code.includes('import ') || code.includes('print(')) {
     return PROGRAMMING_LANGUAGES.PYTHON;
   } else if (code.includes('function') || code.includes('const ') || code.includes('let ')) {
     return PROGRAMMING_LANGUAGES.JAVASCRIPT;

@@ -1,10 +1,3 @@
-import { useEffect, useRef } from 'react';
-import Prism from 'prismjs';
-import 'prismjs/themes/prism.css';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-javascript';
-
 const getElementStyle = (element) => ({
   position: 'absolute',
   width: `${element.width}%`,
@@ -74,32 +67,55 @@ export const VideoElement = ({ element, onDoubleClick, onContextMenu }) => {
   );
 };
 
-export const CodeElement = ({ element, onDoubleClick, onContextMenu }) => {
-  const codeRef = useRef(null);
+const getLanguageStyles = (language) => {
+  switch (language) {
+    case 'python':
+      return {
+        backgroundColor: '#f3f4f6', // Light gray for Python
+        color: '#374151',
+      };
+    case 'javascript':
+      return {
+        backgroundColor: '#fef3c7', // Light yellow for JavaScript
+        color: '#92400e',
+      };
+    case 'c':
+      return {
+        backgroundColor: '#e0f2fe', // Light blue for C
+        color: '#075985',
+      };
+    default:
+      return {
+        backgroundColor: '#f3f4f6',
+        color: '#374151',
+      };
+  };
+};
 
-  useEffect(() => {
-    if (codeRef.current) {
-      Prism.highlightElement(codeRef.current);
-    }
-  }, [element.code, element.language]);
+export const CodeElement = ({ element, onDoubleClick, onContextMenu }) => {
+  const languageStyle = getLanguageStyles(element.language);
 
   return (
     <div
-      style={getElementStyle(element)}
+      style={{
+        ...getElementStyle(element),
+        ...languageStyle,
+      }}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
       className="select-none"
     >
       <pre
-        style={{ fontSize: `${element.fontSize}em` }}
-        className="h-full overflow-auto m-0"
+        style={{ 
+          fontSize: `${element.fontSize}em`,
+          margin: 0,
+          height: '100%',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-all',
+        }}
+        className="overflow-auto"
       >
-        <code
-          ref={codeRef}
-          className={`language-${element.language}`}
-        >
-          {element.code}
-        </code>
+        {element.code}
       </pre>
     </div>
   );
