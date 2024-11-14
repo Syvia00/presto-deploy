@@ -30,3 +30,15 @@ export const FONT_FAMILIES = {
   Helvetica: 'Helvetica Neue, sans-serif',
   Monaco: 'Monaco, monospace'
 };
+
+export const BACKGROUND_TYPES = {
+  SOLID: 'solid',
+  GRADIENT: 'gradient',
+  IMAGE: 'image'
+};
+
+export const GRADIENT_DIRECTIONS = {
+  TOP_BOTTOM: 'to bottom',
+  LEFT_RIGHT: 'to right',
+  DIAGONAL: 'to bottom right'
+};
