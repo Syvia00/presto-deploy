@@ -23,3 +23,10 @@ export const detectLanguage = (code) => {
   }
   return PROGRAMMING_LANGUAGES.JAVASCRIPT; // default
 };
+
+export const FONT_FAMILIES = {
+  Arail: 'Arial, sans-serif',
+  Georgia: 'Georgia, serif',
+  Helvetica: 'Helvetica Neue, sans-serif',
+  Monaco: 'Monaco, monospace'
+};

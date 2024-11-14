@@ -19,6 +19,7 @@ export const TextElement = ({ element, onDoubleClick, onContextMenu }) => {
         ...getElementStyle(element),
         fontSize: `${element.fontSize}em`,
         color: element.color,
+        fontFamily: element.fontFamily || 'Arial, sans-serif',
         overflow: 'hidden',
         textAlign: 'left',
       }}

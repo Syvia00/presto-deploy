@@ -7,7 +7,7 @@ export const LandingPage = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
       <div className="max-w-2xl text-center space-y-8">
         <h1 className="text-6xl font-bold text-gray-900">Welcome to Presto</h1>
-        <p className="text-xl text-gray-600">A lightweight alternative to create and share presentations</p>
+        <p className="text-xl text-gray-600">A lightweight presentation slides creator</p>
         <div className="space-x-4">
           <button
             onClick={() => navigate('/login')}

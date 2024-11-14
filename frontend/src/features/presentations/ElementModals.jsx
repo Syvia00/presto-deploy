@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { detectLanguage } from './constants';
+import { FONT_FAMILIES } from './constants';
 
 export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [data, setData] = useState({
@@ -8,6 +9,7 @@ export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
     text: initialData?.text || '',
     fontSize: initialData?.fontSize || '1',
     color: initialData?.color || '#000000',
+    fontFamily: initialData?.fontFamily || FONT_FAMILIES.Arail,
     x: initialData?.x || '0',
     y: initialData?.y || '0'
   });
@@ -55,6 +57,20 @@ export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
               rows={3}
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Font Family</label>
+            <select
+              value={data.fontFamily}
+              onChange={(e) => setData({ ...data, fontFamily: e.target.value })}
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              {Object.entries(FONT_FAMILIES).map(([key, value]) => (
+                <option key={key} value={value} style={{ fontFamily: value }}>
+                  {key.charAt(0) + key.slice(1).toLowerCase()}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Font Size (em)</label>
@@ -302,12 +318,12 @@ export const VideoElementModal = ({ isOpen, onClose, onSubmit, initialData }) =>
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">YouTube Embed URL</label>
+            <label className="block text-sm font-medium text-gray-700">Embedded video Url</label>
             <input
               type="text"
               value={data.url}
               onChange={(e) => setData({ ...data, url: e.target.value })}
-              placeholder="https://www.youtube.com/embed/..."
+              placeholder="Enter video URL"
               className="mt-1 block w-full border rounded-md p-2"
               required
             />
