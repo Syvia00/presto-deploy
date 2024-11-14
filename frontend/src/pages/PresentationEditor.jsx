@@ -1,6 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { EditTitleModal, DeleteConfirmModal, SlideControls } from '../features/presentations';
+import {
+  EditTitleModal,
+  DeleteConfirmModal,
+  TextElementModal,
+  ImageElementModal,
+  VideoElementModal,
+  CodeElementModal,
+  TextElement,
+  ImageElement,
+  VideoElement,
+  CodeElement,
+  SlideToolbar,
+  ELEMENT_TYPES
+} from '../features/presentations';
 
 export const PresentationEditor = () => {
   const { id } = useParams();
@@ -11,6 +24,8 @@ export const PresentationEditor = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showError, setShowError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeModal, setActiveModal] = useState(null);
+  const [editingElement, setEditingElement] = useState(null);
 
   const fetchPresentation = async () => {
     try {
@@ -167,7 +182,7 @@ export const PresentationEditor = () => {
       
       const newSlide = {
         id: Date.now().toString(),
-        content: [],
+        elements: [],
       };
 
       const updatedPresentation = {
@@ -248,6 +263,146 @@ export const PresentationEditor = () => {
     }
   };
 
+  // Function to handle adding elements
+  const handleAddElement = (type) => {
+    setActiveModal(type);
+    setEditingElement(null);
+  };
+
+  // Function to handle element creation
+  const handleElementCreate = (type, elementData) => {
+    const currentSlide = presentation.slides[currentSlideIndex];
+    const newElement = {
+      id: Date.now().toString(),
+      type,
+      ...elementData,
+    };
+
+    const updatedSlides = [...presentation.slides];
+    updatedSlides[currentSlideIndex] = {
+      ...currentSlide,
+      elements: [...(currentSlide.elements || []), newElement],
+    };
+
+    updatePresentation({
+      ...presentation,
+      slides: updatedSlides,
+    });
+
+    setActiveModal(null);
+  };
+
+  // Function to handle element update
+  const handleElementUpdate = (elementId, elementData) => {
+    const currentSlide = presentation.slides[currentSlideIndex];
+    const updatedElements = currentSlide.elements.map(element =>
+      element.id === elementId ? { ...element, ...elementData } : element
+    );
+
+    const updatedSlides = [...presentation.slides];
+    updatedSlides[currentSlideIndex] = {
+      ...currentSlide,
+      elements: updatedElements,
+    };
+
+    updatePresentation({
+      ...presentation,
+      slides: updatedSlides,
+    });
+
+    setActiveModal(null);
+    setEditingElement(null);
+  };
+
+  // Function to handle element deletion
+  const handleElementDelete = (elementId) => {
+    const currentSlide = presentation.slides[currentSlideIndex];
+    const updatedElements = currentSlide.elements.filter(
+      element => element.id !== elementId
+    );
+
+    const updatedSlides = [...presentation.slides];
+    updatedSlides[currentSlideIndex] = {
+      ...currentSlide,
+      elements: updatedElements,
+    };
+
+    updatePresentation({
+      ...presentation,
+      slides: updatedSlides,
+    });
+  };
+
+  // Function to handle double click on element
+  const handleElementDoubleClick = (element) => {
+    setEditingElement(element);
+    setActiveModal(element.type);
+  };
+
+  // Function to handle right click on element
+  const handleElementRightClick = (e, elementId) => {
+    e.preventDefault();
+    handleElementDelete(elementId);
+  };
+
+  // Helper function to update presentation
+  const updatePresentation = async (updatedPresentation) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5005/store', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      const updatedPresentations = data.store.presentations.map(p => 
+        p.id === id ? updatedPresentation : p
+      );
+
+      await fetch('http://localhost:5005/store', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          store: {
+            ...data.store,
+            presentations: updatedPresentations,
+          },
+        }),
+      });
+
+      setPresentation(updatedPresentation);
+    } catch (error) {
+      console.error('Failed to update presentation:', error);
+    }
+  };
+
+  // Function to render an element
+  const renderElement = (element) => {
+    const props = {
+      key: element.id,
+      element,
+      onDoubleClick: () => handleElementDoubleClick(element),
+      onContextMenu: (e) => handleElementRightClick(e, element.id),
+    };
+
+    switch (element.type) {
+      case ELEMENT_TYPES.TEXT:
+        return <TextElement {...props} />;
+      case ELEMENT_TYPES.IMAGE:
+        return <ImageElement {...props} />;
+      case ELEMENT_TYPES.VIDEO:
+        return <VideoElement {...props} />;
+      case ELEMENT_TYPES.CODE:
+        return <CodeElement {...props} />;
+      default:
+        return null;
+    }
+  };
+
   useEffect(() => {
     fetchPresentation();
   }, [id]);
@@ -279,6 +434,8 @@ export const PresentationEditor = () => {
   if (!presentation) {
     return null;
   }
+
+  const currentSlide = presentation.slides[currentSlideIndex];
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -323,15 +480,15 @@ export const PresentationEditor = () => {
         </div>
 
         {/* Slide Display */}
-        <div className="bg-white rounded-lg shadow-md p-8 min-h-[400px] relative mb-8">
+        <div className="bg-white rounded-lg shadow-md p-8 min-h-[600px] relative mb-8">
           {/* Slide number */}
           <div className="absolute bottom-4 left-4 w-[50px] h-[50px] flex items-center justify-center text-gray-500">
             {currentSlideIndex + 1}
           </div>
           
-          {/* Slide content placeholder */}
-          <div className="w-full h-full flex items-center justify-center">
-            <p className="text-gray-500">Slide {currentSlideIndex + 1}</p>
+          {/* Slide elements */}
+          <div className="w-full h-[600px] relative bg-white">
+            {currentSlide.elements?.map(renderElement)}
           </div>
         </div>
 
@@ -381,7 +538,63 @@ export const PresentationEditor = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Slide Toolbar */}
+      <SlideToolbar onAddElement={handleAddElement} />
+
+      {/* Element Modals */}
+      <TextElementModal
+        isOpen={activeModal === ELEMENT_TYPES.TEXT}
+        onClose={() => {
+          setActiveModal(null);
+          setEditingElement(null);
+        }}
+        onSubmit={(data) => editingElement
+          ? handleElementUpdate(editingElement.id, data)
+          : handleElementCreate(ELEMENT_TYPES.TEXT, data)
+        }
+        initialData={editingElement}
+      />
+
+      <ImageElementModal
+        isOpen={activeModal === ELEMENT_TYPES.IMAGE}
+        onClose={() => {
+          setActiveModal(null);
+          setEditingElement(null);
+        }}
+        onSubmit={(data) => editingElement
+          ? handleElementUpdate(editingElement.id, data)
+          : handleElementCreate(ELEMENT_TYPES.IMAGE, data)
+        }
+        initialData={editingElement}
+      />
+
+      <VideoElementModal
+        isOpen={activeModal === ELEMENT_TYPES.VIDEO}
+        onClose={() => {
+          setActiveModal(null);
+          setEditingElement(null);
+        }}
+        onSubmit={(data) => editingElement
+          ? handleElementUpdate(editingElement.id, data)
+          : handleElementCreate(ELEMENT_TYPES.VIDEO, data)
+        }
+        initialData={editingElement}
+      />
+
+      <CodeElementModal
+        isOpen={activeModal === ELEMENT_TYPES.CODE}
+        onClose={() => {
+          setActiveModal(null);
+          setEditingElement(null);
+        }}
+        onSubmit={(data) => editingElement
+          ? handleElementUpdate(editingElement.id, data)
+          : handleElementCreate(ELEMENT_TYPES.CODE, data)
+        }
+        initialData={editingElement}
+      />
+
+      {/* Title and Delete Modals */}
       <EditTitleModal
         isOpen={showEditTitle}
         onClose={() => setShowEditTitle(false)}
