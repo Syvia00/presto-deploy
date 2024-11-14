@@ -7,12 +7,14 @@ import {
   ImageElementModal,
   VideoElementModal,
   CodeElementModal,
+  BackgroundModal,
   TextElement,
   ImageElement,
   VideoElement,
   CodeElement,
   SlideToolbar,
-  ELEMENT_TYPES
+  ELEMENT_TYPES,
+  BACKGROUND_TYPES,
 } from '../features/presentations';
 
 export const PresentationEditor = () => {
@@ -22,6 +24,7 @@ export const PresentationEditor = () => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showEditTitle, setShowEditTitle] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
   const [showError, setShowError] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeModal, setActiveModal] = useState(null);
@@ -403,11 +406,58 @@ export const PresentationEditor = () => {
     }
   };
 
+  // Function to get background style
+  const getBackgroundStyle = (background) => {
+    if (!background) return {};
+  
+    switch (background.type) {
+    case BACKGROUND_TYPES.SOLID:
+      return { backgroundColor: background.color };
+    case BACKGROUND_TYPES.GRADIENT:
+      return {
+        background: `linear-gradient(${background.direction}, ${background.startColor}, ${background.endColor})`
+      };
+    case BACKGROUND_TYPES.IMAGE:
+      return {
+        backgroundImage: `url(${background.url})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      };
+    default:
+      return {};
+    }
+  };
+  
+  // Background update handlers
+  const handleUpdateSlideBackground = async (background) => {
+    const updatedSlides = [...presentation.slides];
+    updatedSlides[currentSlideIndex] = {
+      ...updatedSlides[currentSlideIndex],
+      background
+    };
+  
+    const updatedPresentation = {
+      ...presentation,
+      slides: updatedSlides
+    };
+  
+    updatePresentation(updatedPresentation);
+  };
+  
+  const handleUpdateDefaultBackground = async (background) => {
+    const updatedPresentation = {
+      ...presentation,
+      defaultBackground: background
+    };
+  
+    updatePresentation(updatedPresentation);
+  };
+
   useEffect(() => {
     fetchPresentation();
   }, [id, fetchPresentation]);
 
-  // Add keyboard navigation
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!presentation) return;
@@ -480,15 +530,27 @@ export const PresentationEditor = () => {
         </div>
 
         {/* Slide Display */}
-        <div className="bg-white rounded-lg shadow-md p-8 min-h-[600px] relative mb-8">
-          {/* Slide number */}
-          <div className="absolute bottom-4 left-4 w-[50px] h-[50px] flex items-center justify-center text-gray-500">
-            {currentSlideIndex + 1}
-          </div>
+        <div className="max-w-7xl mx-auto relative">
+          <button
+            onClick={() => setShowBackgroundModal(true)}
+            className="absolute top-2 right-2 p-2 bg-white bg-opacity-50 hover:bg-opacity-100 rounded-full shadow-sm z-10"
+          >
+            🎨
+          </button>
           
-          {/* Slide elements */}
-          <div className="w-full h-[600px] relative bg-white">
-            {currentSlide.elements?.map(renderElement)}
+          <div 
+            className="bg-white rounded-lg shadow-md p-8 min-h-[600px] relative mb-8"
+            style={getBackgroundStyle(currentSlide.background || presentation.defaultBackground)}
+          >
+            {/* Slide number */}
+            <div className="absolute bottom-4 left-4 w-[50px] h-[50px] flex items-center justify-center text-gray-500">
+              {currentSlideIndex + 1}
+            </div>
+            
+            {/* Slide elements */}
+            <div className="w-full h-[600px] relative bg-white">
+              {currentSlide.elements?.map(renderElement)}
+            </div>
           </div>
         </div>
 
@@ -536,7 +598,18 @@ export const PresentationEditor = () => {
             </button>
           </div>
         </div>
+        {/* Background Modal */}
+        <BackgroundModal
+          isOpen={showBackgroundModal}
+          onClose={() => setShowBackgroundModal(false)}
+          currentSlideBackground={currentSlide.background}
+          defaultBackground={presentation.defaultBackground}
+          onUpdateSlideBackground={handleUpdateSlideBackground}
+          onUpdateDefaultBackground={handleUpdateDefaultBackground}
+        />
       </div>
+
+      
 
       {/* Slide Toolbar */}
       <SlideToolbar onAddElement={handleAddElement} />

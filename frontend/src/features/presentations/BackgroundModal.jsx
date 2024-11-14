@@ -140,4 +140,80 @@ export const BackgroundModal = ({
   };
 
   if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+        <h3 className="text-lg font-semibold mb-4">Background Settings</h3>
+        
+        {/* Tab Buttons */}
+        <div className="flex space-x-2 mb-4">
+          <button
+            onClick={() => {
+              setActiveTab('slide');
+              setBackgroundType(currentSlideBackground?.type || BACKGROUND_TYPES.SOLID);
+              setBackground(currentSlideBackground);
+            }}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'slide' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            Current Slide
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('default');
+              setBackgroundType(defaultBackground?.type || BACKGROUND_TYPES.SOLID);
+              setBackground(defaultBackground);
+            }}
+            className={`px-4 py-2 rounded ${
+              activeTab === 'default' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            Default Theme
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Background Type</label>
+            <select
+              value={backgroundType}
+              onChange={(e) => {
+                setBackgroundType(e.target.value);
+                setBackground({ type: e.target.value });
+              }}
+              className="mt-1 block w-full border rounded-md p-2"
+            >
+              <option value={BACKGROUND_TYPES.SOLID}>Solid Color</option>
+              <option value={BACKGROUND_TYPES.GRADIENT}>Gradient</option>
+              <option value={BACKGROUND_TYPES.IMAGE}>Image</option>
+            </select>
+          </div>
+
+          {renderBackgroundFields()}
+
+          <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            >
+              Apply
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
