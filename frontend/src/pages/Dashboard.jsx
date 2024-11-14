@@ -37,7 +37,10 @@ export const Dashboard = () => {
       const newPresentation = {
         id: Date.now().toString(),
         name,
-        slides: [{ id: '1', content: [] }], // Empty first slide
+        slides: [{ 
+          id: '1', 
+          elements: [], 
+        }], // Empty first slide
       };
 
       const updatedStore = {

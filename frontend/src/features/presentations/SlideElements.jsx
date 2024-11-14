@@ -12,6 +12,11 @@ const getElementStyle = (element) => ({
   left: `${element.x}%`,
   top: `${element.y}%`,
   border: '1px solid #e5e7eb',
+  backgroundColor: 'white', 
+  padding: '8px', 
+  overflow: 'hidden', 
+  borderRadius: '4px', 
+  boxShadow: '0 1px 3px rgba(0,0,0,0.1)', 
 });
 
 export const TextElement = ({ element, onDoubleClick, onContextMenu }) => {
@@ -62,7 +67,6 @@ export const VideoElement = ({ element, onDoubleClick, onContextMenu }) => {
         src={`${element.url}${element.autoplay ? '&autoplay=1' : ''}`}
         width="100%"
         height="100%"
-        frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
