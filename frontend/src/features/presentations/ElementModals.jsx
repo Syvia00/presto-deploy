@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { detectLanguage } from './constants';
 
 export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => {

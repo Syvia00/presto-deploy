@@ -69,26 +69,26 @@ export const VideoElement = ({ element, onDoubleClick, onContextMenu }) => {
 
 const getLanguageStyles = (language) => {
   switch (language) {
-    case 'python':
-      return {
-        backgroundColor: '#f3f4f6', // Light gray for Python
-        color: '#374151',
-      };
-    case 'javascript':
-      return {
-        backgroundColor: '#fef3c7', // Light yellow for JavaScript
-        color: '#92400e',
-      };
-    case 'c':
-      return {
-        backgroundColor: '#e0f2fe', // Light blue for C
-        color: '#075985',
-      };
-    default:
-      return {
-        backgroundColor: '#f3f4f6',
-        color: '#374151',
-      };
+  case 'python':
+    return {
+      backgroundColor: '#f3f4f6', // Light gray for Python
+      color: '#374151',
+    };
+  case 'javascript':
+    return {
+      backgroundColor: '#fef3c7', // Light yellow for JavaScript
+      color: '#92400e',
+    };
+  case 'c':
+    return {
+      backgroundColor: '#e0f2fe', // Light blue for C
+      color: '#075985',
+    };
+  default:
+    return {
+      backgroundColor: '#f3f4f6',
+      color: '#374151',
+    };
   };
 };
 

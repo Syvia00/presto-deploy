@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   EditTitleModal,
@@ -27,7 +27,7 @@ export const PresentationEditor = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [editingElement, setEditingElement] = useState(null);
 
-  const fetchPresentation = async () => {
+  const fetchPresentation = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5005/store', {
@@ -47,7 +47,7 @@ export const PresentationEditor = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
   const handleUpdateTitle = async (newTitle) => {
     try {
@@ -158,17 +158,17 @@ export const PresentationEditor = () => {
     }
   };
 
-  const handlePreviousSlide = () => {
+  const handlePreviousSlide = useCallback(() => {
     if (currentSlideIndex > 0) {
       setCurrentSlideIndex(currentSlideIndex - 1);
     }
-  };
+  }, [currentSlideIndex]);
 
-  const handleNextSlide = () => {
+  const handleNextSlide = useCallback(() => {
     if (currentSlideIndex < presentation.slides.length - 1) {
       setCurrentSlideIndex(currentSlideIndex + 1);
     }
-  };
+  }, [currentSlideIndex, presentation?.slides.length]);
 
   const handleNewSlide = async () => {
     try {
@@ -390,22 +390,22 @@ export const PresentationEditor = () => {
     };
 
     switch (element.type) {
-      case ELEMENT_TYPES.TEXT:
-        return <TextElement {...props} />;
-      case ELEMENT_TYPES.IMAGE:
-        return <ImageElement {...props} />;
-      case ELEMENT_TYPES.VIDEO:
-        return <VideoElement {...props} />;
-      case ELEMENT_TYPES.CODE:
-        return <CodeElement {...props} />;
-      default:
-        return null;
+    case ELEMENT_TYPES.TEXT:
+      return <TextElement {...props} />;
+    case ELEMENT_TYPES.IMAGE:
+      return <ImageElement {...props} />;
+    case ELEMENT_TYPES.VIDEO:
+      return <VideoElement {...props} />;
+    case ELEMENT_TYPES.CODE:
+      return <CodeElement {...props} />;
+    default:
+      return null;
     }
   };
 
   useEffect(() => {
     fetchPresentation();
-  }, [id]);
+  }, [id, fetchPresentation]);
 
   // Add keyboard navigation
   useEffect(() => {
@@ -421,7 +421,7 @@ export const PresentationEditor = () => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [presentation, currentSlideIndex]);
+  }, [presentation, currentSlideIndex, handlePreviousSlide, handleNextSlide]);
 
   if (loading) {
     return (
