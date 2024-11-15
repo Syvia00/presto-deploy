@@ -10,8 +10,6 @@ export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
     fontSize: initialData?.fontSize || '1',
     color: initialData?.color || '#000000',
     fontFamily: initialData?.fontFamily || FONT_FAMILIES.Arail,
-    x: initialData?.x || '0',
-    y: initialData?.y || '0'
   });
 
   if (!isOpen) return null;
@@ -94,34 +92,6 @@ export const TextElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
               required
             />
           </div>
-          {initialData && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">X Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.x}
-                  onChange={(e) => setData({ ...data, x: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Y Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.y}
-                  onChange={(e) => setData({ ...data, y: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-            </>
-          )}
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -149,8 +119,6 @@ export const ImageElementModal = ({ isOpen, onClose, onSubmit, initialData }) =>
     height: initialData?.height || '30',
     src: initialData?.src || '',
     alt: initialData?.alt || '',
-    x: initialData?.x || '0',
-    y: initialData?.y || '0',
   });
 
   const handleFileChange = (e) => {
@@ -224,34 +192,6 @@ export const ImageElementModal = ({ isOpen, onClose, onSubmit, initialData }) =>
               required
             />
           </div>
-          {initialData && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">X Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.x}
-                  onChange={(e) => setData({ ...data, x: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Y Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.y}
-                  onChange={(e) => setData({ ...data, y: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-            </>
-          )}
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -279,8 +219,6 @@ export const VideoElementModal = ({ isOpen, onClose, onSubmit, initialData }) =>
     height: initialData?.height || '50',
     url: initialData?.url || '',
     autoplay: initialData?.autoplay || false,
-    x: initialData?.x || '0',
-    y: initialData?.y || '0',
   });
 
   if (!isOpen) return null;
@@ -339,34 +277,6 @@ export const VideoElementModal = ({ isOpen, onClose, onSubmit, initialData }) =>
               <span className="text-sm font-medium text-gray-700">Autoplay</span>
             </label>
           </div>
-          {initialData && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">X Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.x}
-                  onChange={(e) => setData({ ...data, x: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Y Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.y}
-                  onChange={(e) => setData({ ...data, y: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-            </>
-          )}
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -394,8 +304,6 @@ export const CodeElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
     height: initialData?.height || '30',
     code: initialData?.code || '',
     fontSize: initialData?.fontSize || '1',
-    x: initialData?.x || '0',
-    y: initialData?.y || '0',
   });
 
   if (!isOpen) return null;
@@ -456,34 +364,6 @@ export const CodeElementModal = ({ isOpen, onClose, onSubmit, initialData }) => 
               required
             />
           </div>
-          {initialData && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">X Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.x}
-                  onChange={(e) => setData({ ...data, x: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Y Position (%)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={data.y}
-                  onChange={(e) => setData({ ...data, y: e.target.value })}
-                  className="mt-1 block w-full border rounded-md p-2"
-                  required
-                />
-              </div>
-            </>
-          )}
           <div className="flex justify-end space-x-2">
             <button
               type="button"
