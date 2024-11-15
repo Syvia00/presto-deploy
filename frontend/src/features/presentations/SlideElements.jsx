@@ -1,3 +1,4 @@
+import {DraggableElement} from './DraggableElement'
 const getElementStyle = (element) => ({
   position: 'absolute',
   width: `${element.width}%`,
@@ -12,7 +13,7 @@ const getElementStyle = (element) => ({
   boxShadow: '0 1px 3px rgba(0,0,0,0.1)', 
 });
 
-export const TextElement = ({ element, onDoubleClick, onContextMenu }) => {
+export const TextElement = ({ element, isSelected, onDoubleClick, onContextMenu, onClick, onUpdatePosition}) => {
   return (
     <div
       style={{
@@ -27,12 +28,15 @@ export const TextElement = ({ element, onDoubleClick, onContextMenu }) => {
       onContextMenu={onContextMenu}
       className="select-none"
     >
-      {element.text}
+      <div className="whitespace-pre-wrap">{element.text}</div>
+      {isSelected && (
+        <DraggableElement element={element} onUpdatePosition={onUpdatePosition} />
+      )}
     </div>
   );
 };
 
-export const ImageElement = ({ element, onDoubleClick, onContextMenu }) => {
+export const ImageElement = ({ element, isSelected, onDoubleClick, onContextMenu, onClick, onUpdatePosition }) => {
   return (
     <div
       style={getElementStyle(element)}
@@ -45,11 +49,14 @@ export const ImageElement = ({ element, onDoubleClick, onContextMenu }) => {
         alt={element.alt}
         className="w-full h-full object-contain"
       />
+      {isSelected && (
+        <DraggableElement element={element} onUpdatePosition={onUpdatePosition} />
+      )}
     </div>
   );
 };
 
-export const VideoElement = ({ element, onDoubleClick, onContextMenu }) => {
+export const VideoElement = ({ element, isSelected, onDoubleClick, onContextMenu, onClick, onUpdatePosition }) => {
   return (
     <div
       style={getElementStyle(element)}
@@ -64,6 +71,9 @@ export const VideoElement = ({ element, onDoubleClick, onContextMenu }) => {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
+      {isSelected && (
+        <DraggableElement element={element} onUpdatePosition={onUpdatePosition} />
+      )}
     </div>
   );
 };
@@ -93,7 +103,7 @@ const getLanguageStyles = (language) => {
   };
 };
 
-export const CodeElement = ({ element, onDoubleClick, onContextMenu }) => {
+export const CodeElement = ({ element, isSelected, onDoubleClick, onContextMenu, onClick, onUpdatePosition }) => {
   const languageStyle = getLanguageStyles(element.language);
 
   return (
@@ -118,6 +128,9 @@ export const CodeElement = ({ element, onDoubleClick, onContextMenu }) => {
       >
         {element.code}
       </pre>
+      {isSelected && (
+        <DraggableElement element={element} onUpdatePosition={onUpdatePosition} />
+      )}
     </div>
   );
 };
